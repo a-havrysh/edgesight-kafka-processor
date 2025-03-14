@@ -18,7 +18,12 @@ public interface DetectionMapper {
 
     List<Detection> toDetectionList(Collection<DetectionDto> detectionDtoList);
 
-    @Mapping(target = "id", ignore = true)
-    @Mapping(target = "detections", source = "detections")
-    DetectionFailed toDetectionFailed(List<DetectionDto> detections);
+    List<DetectionFailed> toDetectionFailed(Collection<DetectionDto> detections);
+
+    @Mapping(target = "createdDate", ignore = true)
+    DetectionFailed toDetectionFailed(DetectionDto detection);
+
+    DetectionDto toDetectionDto(DetectionFailed detectionFailed);
+
+    List<DetectionDto> toDetectionDto(Collection<DetectionFailed> detectionFailedList);
 }

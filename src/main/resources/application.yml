@@ -35,3 +35,4 @@ scheduler:
   sync:
     enabled: true
     interval: 60000
+    batch-size: 1000

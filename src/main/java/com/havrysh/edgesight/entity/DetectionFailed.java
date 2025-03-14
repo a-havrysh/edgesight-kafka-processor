@@ -1,15 +1,10 @@
 package com.havrysh.edgesight.entity;
 
-import static jakarta.persistence.GenerationType.IDENTITY;
-
-import com.havrysh.edgesight.config.DetectionDtoConverter;
-import com.havrysh.edgesight.dto.DetectionDto;
-import jakarta.persistence.Convert;
 import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import java.time.LocalDateTime;
-import java.util.List;
 import java.util.Objects;
 import lombok.Data;
 import org.springframework.data.annotation.CreatedDate;
@@ -19,11 +14,22 @@ import org.springframework.data.annotation.CreatedDate;
 public class DetectionFailed {
 
     @Id
-    @GeneratedValue(strategy = IDENTITY)
-    private Long id;
+    private String uniqueObjectId;
 
-    @Convert(converter = DetectionDtoConverter.class)
-    private List<DetectionDto> detections;
+    @NotBlank
+    private String objectType;
+
+    @NotNull
+    private Double confidence;
+
+    @NotNull
+    private LocalDateTime timestamp;
+
+    @NotBlank
+    private String source;
+
+    @NotBlank
+    private String location;
 
     @CreatedDate
     private LocalDateTime createdDate;
@@ -34,11 +40,11 @@ public class DetectionFailed {
             return false;
         }
 
-        return Objects.equals(detections, that.detections);
+        return Objects.equals(uniqueObjectId, that.uniqueObjectId);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hashCode(detections);
+        return Objects.hashCode(uniqueObjectId);
     }
 }

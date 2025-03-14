@@ -1,12 +1,14 @@
 package com.havrysh.edgesight.repository.jpa;
 
 import com.havrysh.edgesight.entity.DetectionFailed;
-import java.util.Optional;
+import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 @Repository
 public interface DetectionRepository extends JpaRepository<DetectionFailed, Long> {
 
-    Optional<DetectionFailed> findFirst();
+    @Query(value = "SELECT * FROM detections LIMIT ?1", nativeQuery = true)
+    List<DetectionFailed> findUnprocessedDetections(int limit);
 }

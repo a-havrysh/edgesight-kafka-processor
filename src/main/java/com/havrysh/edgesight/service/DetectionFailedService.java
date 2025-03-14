@@ -19,21 +19,25 @@ public class DetectionFailedService {
     private final ElasticsearchService elasticsearchService;
 
     @Transactional
-    public void syncFailedDetectionsToElasticsearch() {
-        var unprocessedDetectionOpt = detectionRepository.findFirst();
-        if (unprocessedDetectionOpt.isEmpty()) {
+    public void syncFailedDetectionsToElasticsearch(int batchSize) {
+        var countUnprocessedDetections = detectionRepository.count();
+        if (countUnprocessedDetections == 0) {
             return;
         }
 
-        var unprocessedDetection = unprocessedDetectionOpt.get();
-        var detections = unprocessedDetection.getDetections();
+        log.info("Found {} failed detections in SQL database", countUnprocessedDetections);
 
-        log.info("Starting sync of {} unprocessed detections to Elasticsearch", detections.size());
+        var unprocessedDetections  = detectionRepository.findUnprocessedDetections(batchSize);
+        if (unprocessedDetections.isEmpty()) {
+            return;
+        }
 
-        elasticsearchService.saveAll(detections);
-        detectionRepository.delete(unprocessedDetection);
+        log.info("Starting sync of {} unprocessed detections to Elasticsearch", unprocessedDetections.size());
 
-        log.info("Processed {} detections", detections.size());
+        elasticsearchService.saveAll(detectionMapper.toDetectionDto(unprocessedDetections));
+        detectionRepository.deleteAll(unprocessedDetections);
+
+        log.info("Processed {}/{} detections", unprocessedDetections.size(), countUnprocessedDetections);
     }
 
     @Transactional
@@ -46,7 +50,7 @@ public class DetectionFailedService {
 
 
         try {
-            detectionRepository.save(detectionMapper.toDetectionFailed(detections));
+            detectionRepository.saveAll(detectionMapper.toDetectionFailed(detections));
 
             log.debug("Successfully saved {} failed detections to SQL database", detections.size());
         } catch (Exception e) {
