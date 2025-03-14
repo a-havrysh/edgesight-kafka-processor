@@ -1,0 +1,37 @@
+spring:
+  application:
+    name: edgesight-kafka-processor
+  datasource:
+    url: jdbc:postgresql://localhost:5432/edgesight
+    username: postgres
+    password: postgres
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        format_sql: true
+    show-sql: false
+  elasticsearch:
+    uris: http://localhost:9200
+    username: elastic
+    password: changeme
+kafka:
+  bootstrap-servers: localhost:9092
+  topic:
+    detections: edgesight.detections
+  consumer:
+    group-id: edgesight-processor
+    auto-offset-reset: earliest
+    batch-size: 100
+    concurrency: 3
+    max-poll-records: 500
+    max-poll-interval-ms: 300000
+    session-timeout-ms: 30000
+    heartbeat-interval-ms: 10000
+scheduler:
+  sync:
+    enabled: true
+    interval: 60000
